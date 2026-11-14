@@ -1,0 +1,6 @@
+# Add to ~/.codex/config.toml
+# Then set the token in your shell:  export NUSKPM_TOKEN=nusk_...
+
+[mcp_servers.nuskpm]
+url = "https://nusk.dev/YOUR-WORKSPACE/api/mcp"
+bearer_token_env_var = "NUSKPM_TOKEN"

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
+  "name": "io.github.Shahbazhk/nusk-mcp",
+  "title": "Nusk",
+  "description": "Project management for AI agents: work items, sprints, Gantt schedules, RAID logs and wiki pages.",
+  "version": "1.0.0",
+  "websiteUrl": "https://nusk.dev/mcp",
+  "repository": {
+    "url": "https://github.com/Shahbazhk/nusk-mcp",
+    "source": "github"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://nusk.dev/{workspace}/api/mcp",
+      "variables": {
+        "workspace": {
+          "description": "Your Nusk workspace name, the part after nusk.dev/ in your browser address bar.",
+          "isRequired": true
+        }
+      },
+      "headers": [
+        {
+          "name": "Authorization",
+          "description": "Bearer token. Create one in Nusk under Profile > API tokens. Format: Bearer nusk_...",
+          "isRequired": true,
+          "isSecret": true
+        }
+      ]
+    }
+  ]
+}
