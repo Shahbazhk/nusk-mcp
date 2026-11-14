@@ -33,9 +33,33 @@ The server runs on nusk.dev. This repository holds the setup guide, config examp
 
 You need a Nusk workspace. If you don't have one, [create one](https://nusk.dev/signup?utm_source=github&utm_medium=readme&utm_campaign=nusk-mcp).
 
-**1. Create a token.** In Nusk, open **Profile → API tokens** and create one. Start with **read-only**. The token is shown once, so copy it.
+**1. Connect your agent.** Replace `YOUR-WORKSPACE` with your workspace name (the part after `nusk.dev/` in the address bar). There is no token to create: you sign in through your browser.
 
-**2. Connect your agent.** Replace `YOUR-WORKSPACE` with your workspace name (the part after `nusk.dev/` in the address bar).
+Claude Code:
+
+```bash
+claude mcp add --transport http nuskpm https://nusk.dev/YOUR-WORKSPACE/api/mcp
+```
+
+Then type `/mcp` in Claude Code, pick `nuskpm` and choose **Authenticate**.
+
+Cursor, VS Code and other clients that read `mcp.json` ([file](examples/cursor-mcp.json)):
+
+```json
+{
+  "mcpServers": {
+    "nuskpm": {
+      "url": "https://nusk.dev/YOUR-WORKSPACE/api/mcp"
+    }
+  }
+}
+```
+
+**2. Sign in.** The client opens a Nusk page in your browser. Check the client name, choose **Read only** (start here) or **Read and change**, and click **Allow**.
+
+### With a personal access token
+
+Use a token for Codex, scripts, CI, or any client that can't open a browser sign-in. In Nusk, open **Profile → API tokens**, create one (start with **read-only**) and copy it; it is shown once.
 
 Claude Code:
 
@@ -45,18 +69,7 @@ claude mcp add --transport http nuskpm \
   --header "Authorization: Bearer nusk_..."
 ```
 
-Cursor and other clients that read `mcp.json` ([file](examples/cursor-mcp.json)):
-
-```json
-{
-  "mcpServers": {
-    "nuskpm": {
-      "url": "https://nusk.dev/YOUR-WORKSPACE/api/mcp",
-      "headers": { "Authorization": "Bearer nusk_..." }
-    }
-  }
-}
-```
+Clients that read `mcp.json`: add `"headers": { "Authorization": "Bearer nusk_..." }` next to `url`.
 
 Codex, in `~/.codex/config.toml` ([file](examples/codex-config.toml)):
 
@@ -66,7 +79,7 @@ url = "https://nusk.dev/YOUR-WORKSPACE/api/mcp"
 bearer_token_env_var = "NUSKPM_TOKEN"
 ```
 
-Any client that supports remote HTTP MCP servers with a bearer header should work the same way.
+Any client that supports remote HTTP MCP servers should work: with OAuth sign-in (RFC 9728 and 8414 discovery, dynamic client registration, PKCE S256) or a bearer header. Support for adding servers by URL in web apps such as claude.ai varies by app and plan.
 
 **3. Ask a question.** Try `list my projects`. If the agent answers with your project codes, you're connected.
 
@@ -128,18 +141,20 @@ Projects are named by their two-letter code, for example `HQ`. Work items use ke
 ## Safety
 
 - **The agent is you.** It has your project roles and nothing more. It cannot see or change what you can't.
-- **Read-only tokens** expose only the read tools.
-- **Tokens expire.** You choose the expiry, and you can revoke a token any time under Profile → API tokens.
+- **Read-only access** (chosen at sign-in, or a read-only token) exposes only the read tools.
+- **Short-lived sign-in.** A browser sign-in gives a one-hour access token that renews itself with a rotating 30-day refresh token. It appears under Profile → API tokens as `OAuth: <client>`; delete it to end the connection.
+- **Tokens expire.** For personal access tokens you choose the expiry, and you can revoke one any time under Profile → API tokens.
 - **Changes are traceable.** Edits made through MCP are marked "via AI agent (MCP)" in revision history and can be reverted.
 - **Rate limit:** 600 requests per minute per token.
 
-Treat a token like a password. Don't commit it. Use an environment variable where your client supports it, as in the Codex example.
+Treat a personal access token like a password. Don't commit it. Use an environment variable where your client supports it, as in the Codex example.
 
 ## Troubleshooting
 
 | You see | Fix |
 |---|---|
-| `Use a personal access token (Profile > API tokens)` | The header is missing, or the token doesn't start with `nusk_`. |
+| `Sign in with OAuth, or use a personal access token (Profile > API tokens)` | Not signed in yet. In Claude Code, run `/mcp` and authenticate; otherwise add a `Bearer nusk_...` header. |
+| Sign-in page says the request is not valid or has expired | Start the connection again from your agent; the request lasts a few minutes. |
 | `No project XX (list_projects shows yours)` | Wrong project code, or you aren't a member. Run `list_projects`. |
 | Agent only offers read tools | The token is read-only. Create a read-and-write token. |
 | 404 on the URL | Check the workspace name in the address. |

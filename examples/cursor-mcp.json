@@ -1,10 +1,7 @@
 {
   "mcpServers": {
     "nuskpm": {
-      "url": "https://nusk.dev/YOUR-WORKSPACE/api/mcp",
-      "headers": {
-        "Authorization": "Bearer nusk_..."
-      }
+      "url": "https://nusk.dev/YOUR-WORKSPACE/api/mcp"
     }
   }
 }
